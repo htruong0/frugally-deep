@@ -498,6 +498,16 @@ def show_normalization_layer(layer):
         'variance': encode_floats(layer.variance)
     }
 
+def show_coef_sinh_layer(layer):
+    """Serialise CoefSinh layer to dict (custom layer)"""
+    return {
+        'coef_scale': encode_floats(layer.coef_scale)
+    }
+
+def show_log_layer(layer):
+    """Serialise Log layer to dict (custom layer)"""
+    return None
+
 
 def get_layer_functions_dict():
     return {
@@ -517,7 +527,9 @@ def get_layer_functions_dict():
         'TimeDistributed': show_time_distributed_layer,
         'Input': show_input_layer,
         'Softmax': show_softmax_layer,
-        'Normalization': show_normalization_layer
+        'Normalization': show_normalization_layer,
+        'CoefSinhLayer': show_coef_sinh_layer,
+        'LogLayer': show_log_layer
     }
 
 
