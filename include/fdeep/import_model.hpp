@@ -81,6 +81,9 @@
 #include "fdeep/tensor_shape_variable.hpp"
 #include "fdeep/tensor.hpp"
 
+#include "fdeep/layers/log_layer.hpp"
+#include "fdeep/layers/coef_sinh_layer.hpp"
+
 #include <fplus/fplus.hpp>
 
 #include <algorithm>
@@ -749,6 +752,23 @@ inline layer_ptr create_reshape_layer(
     return std::make_shared<reshape_layer>(name, target_shape);
 }
 
+
+inline layer_ptr create_log_layer(
+    const get_param_f&, const nlohmann::json&,
+    const std::string& name)
+{
+    return std::make_shared<log_layer>(name);
+}
+
+inline layer_ptr create_coef_sinh_layer(
+    const get_param_f& get_param,
+    const nlohmann::json& data,
+    const std::string& name)
+{  
+    float_type coef_scale = data["config"]["coef_scale"];
+    return std::make_shared<coef_sinh_layer>(name, coef_scale);
+}
+
 inline activation_layer_ptr create_linear_layer(
     const get_param_f&, const nlohmann::json&,
     const std::string& name)
@@ -1220,6 +1240,8 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"Bidirectional", create_bidirectional_layer},
             {"Softmax", create_softmax_layer},
             {"Normalization", create_normalization_layer},
+            {"Custom>LogLayer", create_log_layer},
+            {"Custom>CoefSinhLayer", create_coef_sinh_layer}
         };
 
     const wrapper_layer_creators wrapper_creators = {

@@ -22,6 +22,16 @@ inline float_type linear_activation(float_type x)
     return x;
 }
 
+inline float_type sinh(float_type x)
+{
+    return std::sinh(x);
+}
+
+inline float_type logarithm(float_type x)
+{
+    return std::log(x);
+}
+
 inline float_type tanh_activation(float_type x)
 {
     return std::tanh(x);
