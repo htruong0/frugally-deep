@@ -273,12 +273,12 @@ inline float_vec decode_floats(const nlohmann::json& data)
 
     const auto res = Base64_decode(json_data_strs_char_prodiver(data, '='));
     float_vec out;
-    assertion(res.size() % 4 == 0, "invalid float vector data");
-    out.reserve(res.size() / 4);
-    for (std::size_t i = 0; i < res.size(); i+=4)
+    assertion(res.size() % sizeof(float_type) == 0, "invalid float vector data");
+    out.reserve(res.size() / sizeof(float_type));
+    for (std::size_t i = 0; i < res.size(); i+=sizeof(float_type))
     {
         float_type val = static_cast<float_type>(
-            *(reinterpret_cast<const float*>(&(res[i]))));
+            *(reinterpret_cast<const float_type*>(&(res[i]))));
         out.push_back(val);
     }
     return out;
