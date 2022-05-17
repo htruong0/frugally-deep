@@ -13,6 +13,9 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, Embedding
 from tensorflow.keras.models import Model, load_model
+K.set_floatx('float64')
+
+from custom_layers import LogLayer, CoefSinhLayer
 
 __author__ = "Tobias Hermann"
 __copyright__ = "Copyright 2017, Tobias Hermann"
