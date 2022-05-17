@@ -140,6 +140,16 @@ public:
         rank_ = minimal_rank();
     }
 
+    void shrink_rank_with_min(std::size_t min_rank_to_keep)
+    {
+        rank_ = fplus::max(minimal_rank(), min_rank_to_keep);
+    }
+    
+    void maximize_rank()
+    {
+        rank_ = 5;
+    }
+
     std::vector<std::size_t> dimensions() const
     {
         if (rank() == 5)
@@ -380,6 +390,26 @@ inline std::string show_tensor_shapes(
     const std::vector<tensor_shape>& shapes)
 {
     return fplus::show_cont(fplus::transform(show_tensor_shape, shapes));
+}
+
+template <typename F>
+void loop_over_all_dims(const tensor_shape& shape, F f) {
+    for (std::size_t dim5 = 0; dim5 < shape.size_dim_5_; ++dim5)
+    {
+        for (std::size_t dim4 = 0; dim4 < shape.size_dim_4_; ++dim4)
+        {
+            for (std::size_t y = 0; y < shape.height_; ++y)
+            {
+                for (std::size_t x = 0; x < shape.width_; ++x)
+                {
+                    for (std::size_t z = 0; z < shape.depth_; ++z)
+                    {
+                        f(dim5, dim4, y, x, z);
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace fdeep
