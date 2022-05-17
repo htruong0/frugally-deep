@@ -9,7 +9,7 @@ from tensorflow.keras.layers import BatchNormalization, Concatenate
 from tensorflow.keras.layers import Bidirectional, TimeDistributed
 from tensorflow.keras.layers import Conv1D, ZeroPadding1D, Cropping1D
 from tensorflow.keras.layers import Conv2D, ZeroPadding2D, Cropping2D
-from tensorflow.keras.layers import Embedding, Normalization
+from tensorflow.keras.layers import Embedding, Normalization, Rescaling
 from tensorflow.keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D
 from tensorflow.keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D
 from tensorflow.keras.layers import Input, Dense, Dropout, Flatten, Activation
@@ -99,7 +99,7 @@ def get_test_model_exhaustive():
         (14, 15),
         (16,),
         (16,),
-        (2,),
+        (2,),  # 10
         (1,),
         (2,),
         (1,),
@@ -109,7 +109,7 @@ def get_test_model_exhaustive():
         (1, 1, 4),
         (1, 1, 1, 3),
         (1, 1, 1, 4),
-        (1, 1, 1, 1, 3),
+        (1, 1, 1, 1, 3),  # 20
         (1, 1, 1, 1, 4),
         (26, 28, 3),
         (4, 4, 3),
@@ -119,9 +119,22 @@ def get_test_model_exhaustive():
         (1,),
         (1,),
         (1,),
-        (2, 3),
+        (2, 3),  # 30
         (9, 16, 1),
-        (1, 9, 16)
+        (1, 9, 16),
+        (6, 1, 1),
+        (1, 1, 1, 1, 6),
+        (1, 1, 1, 10),
+        (1, 1, 13),
+        (1, 15),
+        (1, 1, 1, 1, 6),
+        (1, 1, 1, 5, 1),
+        (1, 1, 4, 1, 1),  # 40
+        (1, 3, 1, 1, 1),
+        (2, 1, 1, 1, 1),
+        (1, 1, 4, 1, 6),
+        (1, 3, 1, 5, 1),
+        (2, 1, 4, 1, 1),
     ]
 
     inputs = [Input(shape=s) for s in input_shapes]
@@ -152,6 +165,8 @@ def get_test_model_exhaustive():
                                      )(inputs[0]))
     outputs.append(Normalization(axis=None, mean=2.1, variance=2.2)(inputs[4]))
     outputs.append(Normalization(axis=-1, mean=2.1, variance=2.2)(inputs[6]))
+
+    outputs.append(Rescaling(23.5, 42.1)(inputs[0]))
 
     outputs.append(Conv2D(4, (3, 3))(inputs[4]))
     outputs.append(Conv2D(4, (3, 3), use_bias=False)(inputs[4]))
@@ -294,6 +309,22 @@ def get_test_model_exhaustive():
     outputs.append(Multiply()([inputs[11], inputs[13]]))
     outputs.append(Multiply()([inputs[10], inputs[11], inputs[12]]))
     outputs.append(Multiply()([inputs[11], inputs[12], inputs[13]]))
+    outputs.append(Multiply()([inputs[14], inputs[16], inputs[18], inputs[20]]))
+    outputs.append(Multiply()([inputs[14], inputs[16]]))
+    outputs.append(Multiply()([inputs[16], inputs[18]]))
+    outputs.append(Multiply()([inputs[18], inputs[20]]))
+    outputs.append(Multiply()([inputs[30], inputs[33]]))
+    outputs.append(Multiply()([inputs[34], inputs[0]]))
+    outputs.append(Multiply()([inputs[35], inputs[2]]))
+    outputs.append(Multiply()([inputs[36], inputs[4]]))
+    outputs.append(Multiply()([inputs[37], inputs[6]]))
+    outputs.append(Multiply()([inputs[0], inputs[38]]))
+    outputs.append(Multiply()([inputs[0], inputs[39]]))
+    outputs.append(Multiply()([inputs[0], inputs[40]]))
+    outputs.append(Multiply()([inputs[0], inputs[41]]))
+    outputs.append(Multiply()([inputs[0], inputs[42]]))
+    outputs.append(Multiply()([inputs[43], inputs[44]]))
+    outputs.append(Multiply()([inputs[44], inputs[45]]))
 
     shared_conv = Conv2D(1, (1, 1),
                          padding='valid', name='shared_conv', activation='relu')

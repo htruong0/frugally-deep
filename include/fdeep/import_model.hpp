@@ -63,6 +63,7 @@
 #include "fdeep/layers/pooling_2d_layer.hpp"
 #include "fdeep/layers/relu_layer.hpp"
 #include "fdeep/layers/repeat_vector_layer.hpp"
+#include "fdeep/layers/rescaling_layer.hpp"
 #include "fdeep/layers/reshape_layer.hpp"
 #include "fdeep/layers/separable_conv_2d_layer.hpp"
 #include "fdeep/layers/selu_layer.hpp"
@@ -474,14 +475,13 @@ inline layer_ptr create_depthwise_conv_2D_layer(const get_param_f& get_param,
         "invalid number of weights");
     const std::size_t input_depth = slice_weights.size() / kernel_size.area();
     const tensor_shape filter_shape(kernel_size.height_, kernel_size.width_, 1);
-    const std::size_t filter_count = input_depth;
-    float_vec bias(filter_count, 0);
+    float_vec bias(input_depth, 0);
     const bool use_bias = data["config"]["use_bias"];
     if (use_bias)
         bias = decode_floats(get_param(name, "bias"));
-    assertion(bias.size() == filter_count, "size of bias does not match");
+    assertion(bias.size() == input_depth, "size of bias does not match");
     return std::make_shared<depthwise_conv_2d_layer>(name, input_depth,
-        filter_shape, filter_count, strides, pad_type,
+        filter_shape, strides, pad_type,
         dilation_rate, slice_weights, bias);
 }
 
@@ -744,6 +744,15 @@ inline layer_ptr create_repeat_vector_layer(
     return std::make_shared<repeat_vector_layer>(name, n);
 }
 
+inline layer_ptr create_rescaling_layer(
+    const get_param_f&, const nlohmann::json& data,
+    const std::string& name)
+{
+    const float_type scale = data["config"]["scale"];
+    const float_type offset = data["config"]["offset"];
+    return std::make_shared<rescaling_layer>(name, scale, offset);
+}
+
 inline layer_ptr create_reshape_layer(
     const get_param_f&, const nlohmann::json& data,
     const std::string& name)
@@ -954,7 +963,7 @@ inline std::string get_activation_type(const nlohmann::json& data)
     return data;
 }
 
-std::string json_object_get_activation_with_default(const nlohmann::json& config,
+inline std::string json_object_get_activation_with_default(const nlohmann::json& config,
     const std::string& default_activation)
 {
     if (json_obj_has_member(config, "activation"))
@@ -1190,6 +1199,7 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"BatchNormalization", create_batch_normalization_layer},
             {"Dropout", create_identity_layer},
             {"AlphaDropout", create_identity_layer},
+            {"FixedDropout", create_identity_layer},
             {"GaussianDropout", create_identity_layer},
             {"GaussianNoise", create_identity_layer},
             {"SpatialDropout1D", create_identity_layer},
@@ -1231,6 +1241,7 @@ inline layer_ptr create_layer(const get_param_f& get_param,
             {"Cropping2D", create_cropping_2d_layer},
             {"Activation", create_activation_layer},
             {"RepeatVector", create_repeat_vector_layer},
+            {"Rescaling", create_rescaling_layer},
             {"Reshape", create_reshape_layer},
             {"Embedding", create_embedding_layer},
             {"LSTM", create_lstm_layer},
